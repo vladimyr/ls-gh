@@ -1,0 +1,55 @@
+{
+  "name": "ls-gh",
+  "version": "0.0.0",
+  "description": "List github repository contents using SVN bridge",
+  "main": "index.js",
+  "bin": "cli.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "ls",
+    "list",
+    "cli",
+    "gh",
+    "github",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vladimyr/ls-gh.git"
+  },
+  "config": {
+    "ua": "SVN/1.10.0"
+  },
+  "author": {
+    "email": "d.vladimyr@gmail.com",
+    "name": "Dario Vladovic",
+    "url": "https://github.com/vladimyr"
+  },
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/vladimyr/ls-gh/issues"
+  },
+  "homepage": "https://github.com/vladimyr/ls-gh",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "debug": "^4.1.0",
+    "fecha": "^3.0.2",
+    "got": "^9.4.0",
+    "kleur": "^3.0.1",
+    "minimist": "^1.2.0",
+    "pretty-bytes": "^5.1.0",
+    "table": "^5.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-semistandard": "^13.0.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "global-tunnel-ng": "^2.7.1"
+  }
+}
