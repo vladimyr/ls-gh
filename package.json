@@ -39,7 +39,9 @@
     "fecha": "^3.0.2",
     "got": "^9.4.0",
     "kleur": "^3.0.1",
+    "ls-colors": "github:vladimyr/ls-colors#v1.0.0",
     "minimist": "^1.2.0",
+    "minimist-options": "^3.0.2",
     "pretty-bytes": "^5.1.0",
     "table": "^5.1.1"
   },

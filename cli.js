@@ -5,10 +5,12 @@
 const fecha = require('fecha');
 const kleur = require('kleur');
 const list = require('./');
+const lscolors = require('ls-colors');
 const pkg = require('./package.json');
 const prettyBytes = require('pretty-bytes');
 const { table, getBorderCharacters } = require('table');
 
+const LS_COLORS = lscolors();
 const { GithubError } = list;
 // NOTE: Copied from bili (by @egoist): https://git.io/fxupU
 const supportsEmoji = process.platform !== 'win32' ||
@@ -22,16 +24,14 @@ const isDirectory = item => item.type === 'collection';
 const formatType = item => isDirectory(item) ? 'd' : ' ';
 const formatDate = item => fecha.format(item.createdAt, 'MMM DD HH:mm');
 
-const argv = require('minimist')(process.argv.slice(2), {
-  alias: {
-    v: 'version',
-    h: 'help',
-    b: 'branch',
-    j: 'json'
-  },
-  boolean: ['version', 'help', 'json'],
-  string: ['branch']
+const options = require('minimist-options')({
+  help: { type: 'boolean', alias: 'h' },
+  version: { type: 'boolean', alias: 'v' },
+  branch: { type: 'string', alias: 'b' },
+  json: { type: 'boolean', alias: 'j' },
+  colors: { type: 'boolean', default: true }
 });
+const argv = require('minimist')(process.argv.slice(2), options);
 
 const help = `
   ${kleur.bold(pkg.name)} v${pkg.version}
@@ -45,6 +45,7 @@ const help = `
     -j, --json     Output list in JSON format
     -h, --help     Show help
     -v, --version  Show version number
+    --no-colors    Disable \`ls\` colors
 
   Homepage:     ${kleur.green(pkg.homepage)}
   Report issue: ${kleur.green(pkg.bugs.url)}
@@ -53,26 +54,27 @@ const help = `
 program(argv._, argv).catch(err => logError(formatError(err.stack)));
 
 async function program([path], flags) {
+  const colorize = flags.colors && Boolean(process.stdout.isTTY);
   if (flags.version) return console.log(pkg.version);
   if (flags.help) return console.log(help);
   if (!path) return logError(formatError('Error: Github path required!'));
   try {
     const items = await list(path, { branch: flags.branch });
     if (flags.json) return console.log(JSON.stringify(items, null, 2));
-    print(items);
+    print(items, colorize);
   } catch (err) {
     if (!GithubError.isGithubError(err)) throw err;
     return logError(formatError(`Error: ${err.message}`));
   }
 }
 
-function print(items) {
+function print(items, colors) {
   const data = items.map(item => [
     formatType(item),
     item.author,
     formatSize(item),
     formatDate(item),
-    formatLabel(item)
+    formatLabel(item, colors)
   ]);
   const columns = {
     0: { width: 1, paddingRight: 2 },
@@ -89,9 +91,13 @@ function formatSize(item) {
     .replace(/[A-Z]+$/g, ([letter]) => letter);
 }
 
-function formatLabel(item, separator = '/') {
-  if (item.root && isDirectory(item)) return '.';
-  return isDirectory(item) ? item.name + separator : item.name;
+function formatLabel(item, colors = true, separator = '/') {
+  const { Directory } = lscolors.Category;
+  if (isDirectory(item)) {
+    const name = item.root ? '.' : item.name;
+    return colors ? colorize(name, Directory) : (name + separator);
+  }
+  return item.name;
 }
 
 function printList(data, options) {
@@ -101,4 +107,12 @@ function printList(data, options) {
     drawHorizontalLine: () => false,
     ...options
   }).trimRight();
+}
+
+function colorize(str, type) {
+  const colors = LS_COLORS[type].slice(0) || [];
+  if (colors.length <= 0) return str;
+  const last = colors.pop();
+  const chain = colors.reduce((chain, modifier) => chain[modifier](), kleur);
+  return chain[last](str);
 }
