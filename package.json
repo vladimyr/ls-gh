@@ -1,6 +1,6 @@
 {
   "name": "ls-gh",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "List github repository contents using SVN bridge",
   "main": "index.js",
   "bin": "cli.js",
